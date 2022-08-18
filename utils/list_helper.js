@@ -12,7 +12,13 @@ const favoriteBlog = (blogs) => {
         return null
     }
 
-    const max = Math.max(blogs.map(b => b.likes))
+    let max = blogs[0].likes
+    for (let i = 1; i < blogs.length; i++) {
+        if (blogs[i].likes > max) {
+            max = blogs[i].likes
+        }
+    }
+
     return blogs.find(b => b.likes === max)
 }
 
