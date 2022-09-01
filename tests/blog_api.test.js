@@ -70,6 +70,34 @@ test('blog identifier is named id', async () => {
     expect(response.body[0].id).toBeDefined()
 })
 
+test('a valid blog can be added', async () => {
+    const newBlog = {
+        title: "Title",
+        author: "Author",
+        url: "url",
+        likes: 0
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+    const blogs = response.body.map(b => {
+        return {
+            title: b.title,
+            author: b.author,
+            url: b.url,
+            likes: b.likes
+        }
+    })
+
+    expect(response.body).toHaveLength(initialBlogs.length + 1)
+    expect(blogs).toContainEqual(newBlog)
+})
+
 afterAll(() => {
     mongoose.connection.close()
 })
