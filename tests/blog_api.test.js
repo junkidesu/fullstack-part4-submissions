@@ -107,7 +107,7 @@ test('if likes property is missed, it will default to 0', async () => {
 
     await api.post('/api/blogs')
         .send(blogWithoutLikes)
-    
+
     const response = await api.get('/api/blogs')
 
     const savedBlog = response.body.find(b => b.title === blogWithoutLikes.title)
@@ -133,15 +133,46 @@ test('if title or url are missing, backend responds with 400', async () => {
         .post('/api/blogs')
         .send(blogWithoutTitle)
         .expect(400)
-    
+
     await api
         .post('/api/blogs')
         .send(blogWithoutUrl)
         .expect(400)
-    
+
     const response = await api.get('/api/blogs')
 
     expect(response.body).toHaveLength(initialBlogs.length)
+})
+
+test('an existing blog can be deleted', async () => {
+    const response = await api.get('/api/blogs')
+    const blog = response.body[0]
+
+    await api
+        .delete(`/api/blogs/${blog.id}`)
+        .expect(204)
+
+    const updatedResponse = await api.get('/api/blogs')
+
+    expect(updatedResponse.body).toHaveLength(initialBlogs.length - 1)
+    expect(updatedResponse.body.find(b => b.id === blog.id)).toBeUndefined()
+})
+
+test('deleting a non-existing blog does not cause errors', async () => {
+    const response = await api.get('/api/blogs')
+    const blog = response.body[0]
+
+    await api.delete(`/api/blogs/${blog.id}`)
+
+    await api
+        .delete(`/api/blogs/${blog.id}`)
+        .expect(204)
+})
+
+test('server responds with 400 if id is malformatted', async () => {
+    await api
+        .delete('/api/blogs/malformatted_id')
+        .expect(400)
 })
 
 afterAll(() => {
