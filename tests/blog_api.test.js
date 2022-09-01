@@ -116,6 +116,34 @@ test('if likes property is missed, it will default to 0', async () => {
     expect(savedBlog.likes).toBe(0)
 })
 
+test('if title or url are missing, backend responds with 400', async () => {
+    const blogWithoutTitle = {
+        author: "Author",
+        url: "url",
+        likes: 10
+    }
+
+    const blogWithoutUrl = {
+        title: "Title",
+        author: "Author",
+        likes: 10
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(blogWithoutTitle)
+        .expect(400)
+    
+    await api
+        .post('/api/blogs')
+        .send(blogWithoutUrl)
+        .expect(400)
+    
+    const response = await api.get('/api/blogs')
+
+    expect(response.body).toHaveLength(initialBlogs.length)
+})
+
 afterAll(() => {
     mongoose.connection.close()
 })
