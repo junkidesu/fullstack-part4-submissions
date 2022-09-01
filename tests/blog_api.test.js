@@ -51,7 +51,7 @@ beforeEach(async () => {
 
     const promiseArray = blogObjects.map(b => b.save())
     await Promise.all(promiseArray)
-}, 10000)
+}, 20000)
 
 test('correct number of blogs is returned in JSON format', async () => {
     await api
@@ -62,6 +62,12 @@ test('correct number of blogs is returned in JSON format', async () => {
     const response = await api.get('/api/blogs')
 
     expect(response.body).toHaveLength(6)
+})
+
+test('blog identifier is named id', async () => {
+    const response = await api.get('/api/blogs')
+
+    expect(response.body[0].id).toBeDefined()
 })
 
 afterAll(() => {
