@@ -35,6 +35,14 @@ blogsRouter.put('/:id', async (request, response, next) => {
     try {
         const body = { ...request.body }
 
+        if (!body.title) {
+            return response.status(400).send({ error: "title missing" })
+        }
+
+        if (!body.url) {
+            return response.status(400).send({ error: "url missing" })
+        }
+
         const updatedBlog = await Blog.findByIdAndUpdate(
             request.params.id,
             body,
