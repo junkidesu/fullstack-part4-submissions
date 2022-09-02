@@ -135,11 +135,96 @@ describe('deletion of a blog', () => {
             .delete(`/api/blogs/${blog.id}`)
             .expect(204)
     })
-    
+
     test('sends an error with status code 400 if id malformatted', async () => {
         await api
             .delete('/api/blogs/malformatted_id')
             .expect(400)
+    })
+})
+
+describe('updating an existing blog', () => {
+    test('succeeds with valid data', async () => {
+        const blogs = await helper.blogsInDb()
+        const blog = blogs[0]
+
+        const changedBlog = {
+            title: blog.title,
+            author: blog.author,
+            url: blog.url,
+            likes: blog.likes + 10
+        }
+
+        await api
+            .put(`/api/blogs/${blog.id.toString()}`)
+            .send(changedBlog)
+            .expect(200)
+
+        const blogsAtEnd = await helper.blogsInDb()
+
+        const updatedBlog = blogsAtEnd
+            .find(b => b.id.toString() === blog.id.toString())
+
+        expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+        expect(updatedBlog.likes).toBe(blog.likes + 10)
+    })
+
+    test('fails with status code 400 if data invalid', async () => {
+        const blogs = await helper.blogsInDb()
+        const blog = blogs[0]
+
+        const blogWithoutTitle = {
+            author: blog.author,
+            url: blog.url,
+            likes: blog.likes + 10
+        }
+
+        const blogWithoutUrl = {
+            title: blog.title,
+            author: blog.author,
+            likes: blog.likes + 10
+        }
+
+        await api
+            .put(`/api/blogs/${blog.id.toString()}`)
+            .send(blogWithoutTitle)
+            .expect(400)
+
+        await api
+            .put(`/api/blogs/${blog.id.toString()}`)
+            .send(blogWithoutUrl)
+            .expect(400)
+
+        const blogsAtEnd = await helper.blogsInDb()
+
+        const updatedBlog = blogsAtEnd
+            .find(b => b.id.toString() === blog.id.toString())
+
+        expect(updatedBlog.likes).toBe(blog.likes)
+    })
+
+    test('fails with status code 400 if id malformatted', async () => {
+        const blogs = await helper.blogsInDb()
+        const blog = blogs[0]
+
+        const changedBlog = {
+            title: blog.title,
+            author: blog.author,
+            url: blog.url,
+            likes: blog.likes + 10
+        }
+
+        await api
+            .put(`/api/blogs/malformatted_id`)
+            .send(changedBlog)
+            .expect(400)
+
+        const blogsAtEnd = await helper.blogsInDb()
+
+        const updatedBlog = blogsAtEnd
+            .find(b => b.id.toString() === blog.id.toString())
+
+        expect(updatedBlog.likes).toBe(blog.likes)
     })
 })
 
