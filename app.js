@@ -5,6 +5,7 @@ const middleware = require('./utils/middleware')
 const cors = require('cors')
 const blogsRouter = require('./constollers/blogs')
 const usersRouter = require('./constollers/users')
+const loginRouter = require('./constollers/login')
 const mongoose = require('mongoose')
 const logger = require('./utils/logger')
 
@@ -25,6 +26,7 @@ app.use(express.json())
 
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
+app.use('/api/login', loginRouter)
 
 app.use(middleware.errorHandler)
 
