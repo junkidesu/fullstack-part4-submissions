@@ -7,6 +7,8 @@ const errorHandler = (error, request, response, next) => {
         response.status(400).send({ error: error.message })
     } else if (error.name === "CastError") {
         response.status(400).send({ error: "malformatted id" })
+    } else if (error.name === 'JsonWebTokenError') {
+        response.status(401).send({ error: 'invalid token' })
     }
 
     next(error)
