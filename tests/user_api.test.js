@@ -22,7 +22,11 @@ const initialUsers = [
 beforeEach(async () => {
     await User.deleteMany({})
 
-    const userObjects = initialUsers.map(u => new User(u))
+    const userObjects = initialUsers.map(u => new User({
+        username: u.username,
+        name: u.name,
+        password: bcrypt.hash(u.password, 10)
+    }))
 
     const promiseArray = userObjects.map(u => u.save())
 
