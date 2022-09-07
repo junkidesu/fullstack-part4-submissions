@@ -111,12 +111,12 @@ describe('favorite blog', () => {
 })
 
 describe('author with the most blogs', () => {
-    test('of an empty list returns undefined', () => {
+    test('of an empty list is undefined', () => {
         const result = listHelper.mostBlogs([])
         expect(result).toBeUndefined()
     })
 
-    test('of a list with one blog returns the author of the blog', () => {
+    test('of a list with one blog is the author of the blog', () => {
         const result = listHelper.mostBlogs(listWithOneBlog)
         expect(result).toEqual({
             author: 'Edsger W. Dijkstra',
@@ -124,11 +124,34 @@ describe('author with the most blogs', () => {
         })
     })
 
-    test('of a bigger list returns the correct number', () => {
+    test('of a bigger list is correct', () => {
         const result = listHelper.mostBlogs(blogs)
         expect(result).toEqual({
             author: 'Robert C. Martin',
             blogs: 3
+        })
+    })
+})
+
+describe('author with the most likes', () => {
+    test('of an empty set is undefined', () => {
+        const result = listHelper.mostLikes([])
+        expect(result).toBeUndefined()
+    })
+
+    test('of a list with one blog is the author of that blog', () => {
+        const result = listHelper.mostLikes(listWithOneBlog)
+        expect(result).toEqual({
+            author: 'Edsger W. Dijkstra',
+            likes: 5
+        })
+    })
+
+    test('of a bigger list is correct', () => {
+        const result = listHelper.mostLikes(blogs)
+        expect(result).toEqual({
+            author: 'Edsger W. Dijkstra',
+            likes: 17
         })
     })
 })
