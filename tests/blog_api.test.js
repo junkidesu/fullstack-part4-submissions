@@ -18,7 +18,14 @@ beforeEach(async () => {
         passwordHash: await bcrypt.hash('password', 10)
     })
 
+    const anotherUser = new User({
+        username: 'anotherusername',
+        name: 'Another Full Name',
+        passwordHash: await bcrypt.hash('anotherpassword', 10)
+    })
+
     await user.save()
+    await anotherUser.save()
 
     const blogObjects = helper.initialBlogs.map(b => new Blog({ ...b, user: user._id }))
 
@@ -214,6 +221,25 @@ describe('deletion of a blog', () => {
                 .set('Authorization', `bearer ${token}`)
                 .expect(400)
         })
+
+        test('does not fail if blog non existing', async () => {
+            const token = await login({
+                username: 'username',
+                password: 'password'
+            })
+
+            const blogs = await helper.blogsInDb()
+            const blog = blogs[0]
+
+            await api
+                .delete(`/api/blogs/${blog.id.toString()}`)
+                .set('Authorization', `bearer ${token}`)
+
+            await api
+                .delete(`/api/blogs/${blog.id.toString()}`)
+                .set('Authorization', `bearer ${token}`)
+                .expect(204)
+        })
     })
 
     test('fails with appropriate code if token not provided', async () => {
@@ -223,6 +249,23 @@ describe('deletion of a blog', () => {
         await api
             .delete(`/api/blogs/${blog.id}`)
             .expect(401)
+    })
+
+    test('fails with suitable code and message if not done by creator', async () => {
+        const blogsAtStart = await helper.blogsInDb()
+        const blog = blogsAtStart[0] //we can safely take the first blog because another user has no blogs
+
+        const token = await login({
+            username: 'anotherusername',
+            password: 'anotherpassword'
+        })
+
+        const response = await api
+            .delete(`/api/blogs/${blog.id.toString()}`)
+            .set('Authorization', `bearer ${token}`)
+            .expect(401)
+
+        expect(response.body.error).toContain('a blog can be deleted only by its creator')
     })
 })
 
