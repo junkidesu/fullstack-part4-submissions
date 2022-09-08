@@ -8,14 +8,14 @@ blogsRouter.get('/', async (request, response) => {
 })
 
 blogsRouter.post('/', async (request, response, next) => {
+    if (!request.user) {
+        return response.status(401).json({
+            error: 'token missing or invalid'
+        })
+    }
+
     const user = request.user
     const body = request.body
-
-    const token = request.token
-    const decodedToken = jwt.verify(token, process.env.SECRET)
-    if (!decodedToken.id) {
-        return response.status(401).send({ error: 'token missing or invalid' })
-    }
 
     const blog = new Blog({
         ...body,
